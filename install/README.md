@@ -2,24 +2,6 @@
 
 ### Step1: `On All Machines ( Master & All nodes ):`
 
-    ### INSTALL DOCKER & Configure 
-    
-    sudo apt-get update
-    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-    sudo apt-get update ; clear
-    sudo apt-get install -y docker-ce
-    
-    sudo vi /etc/docker/daemon.json
-    
-	{
-    		"exec-opts": ["native.cgroupdriver=systemd"]
-	}
-    
-    sudo service docker restart
-  
     
     ### INSTALL KUBEADM,KUBELET,KUBECTL
 
@@ -30,14 +12,14 @@
 	
 ### Step2: `On Master only:`
 
-    sudo kubeadm init --ignore-preflight-errors=all
-	
+    kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=all
+
     sudo mkdir -p $HOME/.kube
     sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
     sudo chown $(id -u):$(id -g) $HOME/.kube/config
     
-    ## Weave
-    kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+    ## Flannel
+    kubectl apply -f https://github.com/coreos/flannel/raw/master/Documentation/kube-flannel.yml
     
     kubectl get nodes
     kubectl get all --all-namespaces
